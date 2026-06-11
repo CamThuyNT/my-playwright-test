@@ -1,50 +1,50 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage'; 
+import { Page } from '@playwright/test';
+import { BasePage } from './BasePage';
 
 export class CheckoutPage extends BasePage {
-  readonly checkoutButton: Locator;
-  readonly firstNameInput: Locator;
-  readonly lastNameInput: Locator;
-  readonly zipCodeInput: Locator;
-  readonly continueButton: Locator;
-  readonly overviewItemName: Locator;
-  readonly overviewItemPrice: Locator;
-  readonly finishButton: Locator;
+  private readonly checkoutBtn: string;
+  private readonly firstNameInp: string;
+  private readonly lastNameInp: string;
+  private readonly zipCodeInp: string;
+  private readonly continueBtn: string;
+  private readonly overviewItemNameLabel: string;
+  private readonly overviewItemPriceLabel: string;
+  private readonly finishBtn: string;
 
   constructor(page: Page) {
-    super(page); 
-    // Giữ nguyên khởi tạo locator bằng getByTestId cho chuẩn chỉ
-    this.checkoutButton = this.page.getByTestId('checkout');
-    this.firstNameInput = this.page.getByTestId('firstName');
-    this.lastNameInput = this.page.getByTestId('lastName');
-    this.zipCodeInput = this.page.getByTestId('postalCode');
-    this.continueButton = this.page.getByTestId('continue');
-    this.overviewItemName = this.page.getByTestId('inventory-item-name');
-    this.overviewItemPrice = this.page.getByTestId('inventory-item-price');
-    this.finishButton = this.page.getByTestId('finish');
+    super(page);
+    
+    this.checkoutBtn = '[data-test="checkout"]';
+    this.firstNameInp = '[data-test="firstName"]';
+    this.lastNameInp = '[data-test="lastName"]';
+    this.zipCodeInp = '[data-test="postalCode"]';
+    this.continueBtn = '[data-test="continue"]';
+    this.overviewItemNameLabel = '[data-test="inventory-item-name"]';
+    this.overviewItemPriceLabel = '[data-test="inventory-item-price"]';
+    this.finishBtn = '[data-test="finish"]';
   }
 
-  // GỌI CÁC HÀM TỪ BASEPAGE QUA TỪ KHÓA 'this'
   async clickCheckout(): Promise<void> {
-    await this.clickOn(this.checkoutButton); // Thay vì .click()
+    await this.clickElement(this.checkoutBtn);
   }
 
   async fillInformation(firstName: string, lastName: string, zipCode: string): Promise<void> {
-    await this.typeTo(this.firstNameInput, firstName); // Thay vì .fill()
-    await this.typeTo(this.lastNameInput, lastName);
-    await this.typeTo(this.zipCodeInput, zipCode);
-    await this.clickOn(this.continueButton);
+    // Tái sử dụng hàm fillField từ BasePage rất gọn gàng
+    await this.fillField(this.firstNameInp, firstName);
+    await this.fillField(this.lastNameInp, lastName);
+    await this.fillField(this.zipCodeInp, zipCode);
+    await this.clickElement(this.continueBtn);
   }
 
   async getOverviewItemName(): Promise<string> {
-    return await this.getTextOf(this.overviewItemName); // Thay vì .innerText()
+    return await this.page.locator(this.overviewItemNameLabel).innerText();
   }
 
   async getOverviewItemPrice(): Promise<string> {
-    return await this.getTextOf(this.overviewItemPrice);
+    return await this.page.locator(this.overviewItemPriceLabel).innerText();
   }
 
   async clickFinish(): Promise<void> {
-    await this.clickOn(this.finishButton);
+    await this.clickElement(this.finishBtn);
   }
 }
