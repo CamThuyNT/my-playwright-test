@@ -1,7 +1,7 @@
 import { Page, Locator } from '@playwright/test';
+import { BasePage } from './BasePage'; 
 
-export class CheckoutPage {
-  readonly page: Page;
+export class CheckoutPage extends BasePage {
   readonly checkoutButton: Locator;
   readonly firstNameInput: Locator;
   readonly lastNameInput: Locator;
@@ -12,37 +12,39 @@ export class CheckoutPage {
   readonly finishButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-    this.checkoutButton = page.locator('[data-test="checkout"]');
-    this.firstNameInput = page.locator('[data-test="firstName"]');
-    this.lastNameInput = page.locator('[data-test="lastName"]');
-    this.zipCodeInput = page.locator('[data-test="postalCode"]');
-    this.continueButton = page.locator('[data-test="continue"]');
-    this.overviewItemName = page.locator('[data-test="inventory-item-name"]');
-    this.overviewItemPrice = page.locator('[data-test="inventory-item-price"]');
-    this.finishButton = page.locator('[data-test="finish"]');
+    super(page); 
+    // Giữ nguyên khởi tạo locator bằng getByTestId cho chuẩn chỉ
+    this.checkoutButton = this.page.getByTestId('checkout');
+    this.firstNameInput = this.page.getByTestId('firstName');
+    this.lastNameInput = this.page.getByTestId('lastName');
+    this.zipCodeInput = this.page.getByTestId('postalCode');
+    this.continueButton = this.page.getByTestId('continue');
+    this.overviewItemName = this.page.getByTestId('inventory-item-name');
+    this.overviewItemPrice = this.page.getByTestId('inventory-item-price');
+    this.finishButton = this.page.getByTestId('finish');
   }
 
-  async clickCheckout() {
-    await this.checkoutButton.click();
+  // GỌI CÁC HÀM TỪ BASEPAGE QUA TỪ KHÓA 'this'
+  async clickCheckout(): Promise<void> {
+    await this.clickOn(this.checkoutButton); // Thay vì .click()
   }
 
-  async fillInformation(firstName: string, lastName: string, zipCode: string) {
-    await this.firstNameInput.fill(firstName);
-    await this.lastNameInput.fill(lastName);
-    await this.zipCodeInput.fill(zipCode);
-    await this.continueButton.click();
+  async fillInformation(firstName: string, lastName: string, zipCode: string): Promise<void> {
+    await this.typeTo(this.firstNameInput, firstName); // Thay vì .fill()
+    await this.typeTo(this.lastNameInput, lastName);
+    await this.typeTo(this.zipCodeInput, zipCode);
+    await this.clickOn(this.continueButton);
   }
 
   async getOverviewItemName(): Promise<string> {
-    return await this.overviewItemName.innerText();
+    return await this.getTextOf(this.overviewItemName); // Thay vì .innerText()
   }
 
   async getOverviewItemPrice(): Promise<string> {
-    return await this.overviewItemPrice.innerText();
+    return await this.getTextOf(this.overviewItemPrice);
   }
 
-  async clickFinish() {
-    await this.finishButton.click();
+  async clickFinish(): Promise<void> {
+    await this.clickOn(this.finishButton);
   }
 }
